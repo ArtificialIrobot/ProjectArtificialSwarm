@@ -1,0 +1,5 @@
+The War Game
+
+
+using artificial Swarm Intelligence.
+kami ingin menerapkan 2 grup swarm yang saling beradu.

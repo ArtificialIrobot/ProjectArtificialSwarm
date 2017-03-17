@@ -2,4 +2,12 @@ The War Game
 
 
 using artificial Swarm Intelligence.
-kami ingin menerapkan 2 grup swarm yang saling beradu.
+kami ingin menerapkan 2 grup swarm
+the chaser
+the chased
+
+misi dari swarm ini
+the chaser
+	mengejar swarm yang lain, memberikan tensi kepada swarm yang dikejar agar meningkatkan state threat sehingga swarm bergerak lebih agresif
+the chased
+	berusaha mencari jalan paling efisien untuk keluar dari maze, dan tidak dimangsa oleh swarn chaser.

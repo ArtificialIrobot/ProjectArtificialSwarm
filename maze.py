@@ -14,8 +14,8 @@ from random import shuffle, randrange
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
-num_rows = 10 # number of rows
-num_cols = 10 # number of columns
+num_rows = int(input("rows")) # number of rows
+num_cols = int(input("columns")) # number of columns
 
 # The array M is going to hold the array information for each cell.
 # The first four coordinates tell if walls exist on those sides
@@ -74,88 +74,96 @@ while history:
 
 
 # Open the walls at the start and finish
-M[9,0,0] = 1
-M[0,9,2] = 1
+
+M[0,num_cols-1,2] = 1
 
 # Generate the image for display
 
 for row in range(0,num_rows):
     for col in range(0,num_cols):
-        tes=0
-        tes1=0
 
-        print (M[row,col])
+
+        print(row,col,M[row,col])
 
         cell_data = M[row,col]
         for i in range(10*row+1,10*row+9):
             image[i,range(10*col+1,10*col+9)] = 1
-            if cell_data[0] == 1: image[range(10*row+1,10*row+9),10*col] = 1
-            if cell_data[1] == 1: image[10*row,range(10*col+1,10*col+9)] = 1
-            if cell_data[2] == 1: image[range(10*row+1,10*row+9),10*col+9] = 1
-            if cell_data[3] == 1: image[10*row+9,range(10*col+1,10*col+9)] = 1
+            if (cell_data[0] == 1):
+                image[range(10*row+1,10*row+9),10*col] = 1
+
+            if (cell_data[1] == 1):
+                image[10*row,range(10*col+1,10*col+9)] = 1
+
+            if (cell_data[2] == 1):
+                image[range(10*row+1,10*row+9),10*col+9] = 1
+
+            if (cell_data[3] == 1):
+                image[10*row+9,range(10*col+1,10*col+9)] = 1
+
 
 
 #######################################
 
 class Bully:
 
-    def __init__(self,posx,posy):
-        self.celposx=0
+    def __init__(self,celposx,cel):
+        self.celposx=num_rows-1
         self.celposy=0
-        self.celposx=0
-        self.celposy=0
-        self.posx=posx
-        self.posy=posy
-        self.speed=0.1
+        self.posx=0
+        self.posy=0
+        self.speed=1.5
         self.x=-1
         self.y=-1
-        self.cell_row = M[0]
-        self.celll_col = M[1]
-        self.prev_Block_Row = -1
-        self.prev_Block_Col = -1
+        self.map=M
+        self.stackx=[]
+        self.stacky=[]
 
     def celmove(self):
-        available = []
-        if self.cell_row != self.prev_Block_Row and self.cell_row != self.prev_Block_Col:
-            if(M[self.celposx,self.celposy,0]==1):
-                available.append(0)
-            if(M[self.celposx,self.celposy,1]==1):
-                available.append(1)
-            if(M[self.celposx,self.celposy,2]==1):
-                available.append(2)
-            if(M[self.celposx,self.celposy,3]==1):
-                available.append(3)
-            if len(available) > 0 :
-                rand = random.randint(0,len(available)-1)
-                move=rand
-                while len(available) > 0:
-                    available.pop()
-        else :
-        	self.prev_Block = self.cell_block
+        if(self.celposx!=0 or self.celposy!=num_cols-1):
 
-        if(move==0):
-            self.celposx += self.speed
-       	elif(move==1):
-            self.celposy += self.speed
-        elif(move==2):
-            self.celposx += self.speed
-        elif(move==3):
-            self.celposy += self.speed
+            print("jalan")
+            movee=[]
 
+            self.stackx.append(self.celposx)
+            self.stacky.append(self.celposy)
+
+            self.map[self.celposx,self.celposy,4]=0
+            if(self.map[self.celposx,self.celposy,0]==1 and self.map[self.celposx,self.celposy-1,4]==1):
+                movee.append(0)
+            if(self.map[self.celposx,self.celposy,1]==1 and self.map[self.celposx-1,self.celposy,4]==1):
+                movee.append(1)
+            if(self.map[self.celposx,self.celposy,2]==1 and self.map[self.celposx,self.celposy+1,4]==1):
+                movee.append(2)
+            if(self.map[self.celposx,self.celposy,3]==1 and self.map[self.celposx+1,self.celposy,4]==1):
+                movee.append(3)
+
+            if(len(movee)>0):
+                rand=random.randint(0,len(movee)-1)
+                move=movee[rand]
+
+                if(move==0):
+                    self.celposy-=1
+                elif(move==1):
+                    self.celposx-=1
+                elif(move==2):
+                    self.celposy+=1
+                elif(move==3):
+                    self.celposx+=1
+            else:
+                print("backtrack")
+                if(len(self.stackx)>0):
+                    self.stackx.pop()
+                    self.stacky.pop()
+                if(len(self.stackx)>0):
+                    self.celposx=self.stackx.pop()
+                    self.celposy=self.stacky.pop()
 
 
     def move(self):
-        print (self.celposx)
-        print (self.celposy)
+        self.posx=self.celposy*10+random.randint(30,70)/10
+        self.posy=self.celposx*10+random.randint(30,70)/10
+        print("posisi: ",self.posx,self.posy)
 
-        self.posx=self.celposx*10
-        self.posy=(num_rows*num_cols)-(self.celposy*10)
-
-
-    def getx(self):
-        return self.posx
-    def gety(self):
-        return self.posy
 
 
 
@@ -164,31 +172,37 @@ class Bully:
 varbully=[]
 
 
-for i in range (1):
-    varbully.append(Bully(random.randint(0,num_rows-1)*1.0,random.randint(num_rows*num_cols-3,num_rows*num_cols-3)*1.0))
+for i in range (30):
+    varbully.append(Bully(random.randint(0,num_rows-3),random.randint(0,num_cols-4)))
 
-tmax = 50
-
+tmax = 1000
+pg=0
 fig = plt.figure()
+
 for t in range (tmax):
+
     fig = plt.figure()
-    plt.gca().set_xlim([-10,(num_rows*num_cols)+10])
-    plt.gca().set_ylim([-10,(num_rows*num_cols)+10])
+    plt.gca().set_xlim([-10,(num_rows*10)+10])
+    plt.gca().set_ylim([-10,(num_cols*10)+10])
 
-
-    for i in range (len(varbully)):
-        plt.scatter (varbully[i].getx(),varbully[i].gety(),color='red',s=50)
-        varbully[i].celmove()
+    for i in range (0,len(varbully)):
         varbully[i].move()
+        plt.scatter (varbully[i].posx,varbully[i].posy,color='blue',s=5)
+        varbully[i].celmove()
 
 
 
 
 
-    plt.title('{0:03d}'.format(t))
+
+
+
+    plt.title('{0:03d}'.format(pg))
     plt.imshow(image, cmap = cm.Greys_r, interpolation='none')
-    filename = 'frame{0:03d}.png'.format(t)
+    filename = 'frame{0:03d}.png'.format(pg)
+    pg+=1
     plt.savefig(filename, bbox_inches='tight')
+
     plt.close(fig)
 
 

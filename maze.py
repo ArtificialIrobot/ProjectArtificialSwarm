@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.cm as cm
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
+import copy as kopi
 import random
 import math
 from random import shuffle, randrange
@@ -103,6 +104,33 @@ for row in range(0,num_rows):
 
 
 #######################################
+class Pemakan:
+    def __init__(self,a,b):
+        self.posx=a
+        self.posy=b
+        self.speed=0.5
+        self.skor=0.05
+        self.x=-1
+        self.y=-1
+    def look(self):
+        mindist=9999999999
+        minfood=0
+
+        for i in range (len(varbully)):
+            if(varbully[i].status==1):
+                dist=math.sqrt((self.posx-varbully[i].posx)**2+(self.posy-varbully[i].posy)**2)
+                if (mindist>dist and dist!=0):
+                    mindist=dist
+                    minfood=i
+
+        self.x=self.speed*(varbully[minfood].posx-self.posx)/mindist
+        self.y=self.speed*(varbully[minfood].posy-self.posy)/mindist
+
+    def move(self):
+        self.posx=self.posx+self.x
+        self.posy=self.posy+self.y
+    def inc(self):
+        self.speed+=self.skor
 
 class Bully:
 
@@ -111,10 +139,10 @@ class Bully:
         self.celposy=0
         self.posx=0
         self.posy=0
-        self.speed=1.5
+        self.status=1
         self.x=-1
         self.y=-1
-        self.map=M
+        self.map=kopi.copy(M)
         self.stackx=[]
         self.stacky=[]
 
@@ -157,52 +185,61 @@ class Bully:
                 if(len(self.stackx)>0):
                     self.celposx=self.stackx.pop()
                     self.celposy=self.stacky.pop()
+            if(self.celposy==num_cols-1 and self.celposx==0):
+                self.status=2
 
 
     def move(self):
         self.posx=self.celposy*10+random.randint(30,70)/10
         self.posy=self.celposx*10+random.randint(30,70)/10
-        print("posisi: ",self.posx,self.posy)
-
-
-
-
-
 
 varbully=[]
-
+varmakan=[]
 
 for i in range (30):
     varbully.append(Bully(random.randint(0,num_rows-3),random.randint(0,num_cols-4)))
 
-tmax = 1000
+varmakan.append(Pemakan(0,0))
+varmakan.append(Pemakan((num_cols*10-1)/2,0))
+tmax = 2000
 pg=0
 fig = plt.figure()
 
 for t in range (tmax):
 
     fig = plt.figure()
-    plt.gca().set_xlim([-10,(num_rows*10)+10])
-    plt.gca().set_ylim([-10,(num_cols*10)+10])
+    plt.gca().set_xlim([-10,(num_cols*10)+10])
+    plt.gca().set_ylim([-10,(num_rows*10)+10])
 
     for i in range (0,len(varbully)):
-        varbully[i].move()
-        plt.scatter (varbully[i].posx,varbully[i].posy,color='blue',s=5)
-        varbully[i].celmove()
+        if(varbully[i].status>0):
+            varbully[i].move()
+            varbully[i].celmove()
 
+    for i in range (0,len(varmakan)):
+        varmakan[i].look()
+        varmakan[i].move()
 
+    for i in range (0,len(varmakan)):
+        for j in range (0,len(varbully)):
+            if(abs(varbully[j].posx-varmakan[i].posx )<=0.1*num_cols  and abs(varbully[j].posy-varmakan[i].posy )<= 0.1*num_rows):
+                if(varbully[j].status==1):
+                    varmakan[i].inc()
+                    print("eat bro")
+                    varbully[j].status=0
 
+    for i in range (0,len(varbully)):
+        if(varbully[i].status>0):
+            plt.scatter (varbully[i].posx,varbully[i].posy,color='blue',s=5)
 
-
-
-
+    for i in range (0,len(varmakan)):
+        plt.scatter (varmakan[i].posx,varmakan[i].posy,color='red',s=150)
 
     plt.title('{0:03d}'.format(pg))
     plt.imshow(image, cmap = cm.Greys_r, interpolation='none')
     filename = 'frame{0:03d}.png'.format(pg)
     pg+=1
     plt.savefig(filename, bbox_inches='tight')
-
     plt.close(fig)
 
 
